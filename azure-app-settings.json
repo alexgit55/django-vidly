@@ -1,0 +1,84 @@
+{
+    "name": "Application Settings for Django Vidly App",
+    "description": "Azure App Service application settings in JSON format for easy import/export",
+    "settings": [
+        {
+            "name": "DEBUG",
+            "value": "False",
+            "slotSetting": false,
+            "description": "Django debug mode - should be False in production"
+        },
+        {
+            "name": "DJANGO_SETTINGS_MODULE",
+            "value": "vidly.production_settings",
+            "slotSetting": false,
+            "description": "Django settings module to use"
+        },
+        {
+            "name": "WEBSITE_HOSTNAME",
+            "value": "mydjangotest-exgge0dmfddwbnga.eastus-01.azurewebsites.net",
+            "slotSetting": false,
+            "description": "Your Azure App Service hostname"
+        },
+        {
+            "name": "PYTHONPATH",
+            "value": "",
+            "slotSetting": false,
+            "description": "Python path for the application"
+        },
+        {
+            "name": "SCM_DO_BUILD_DURING_DEPLOYMENT",
+            "value": "true",
+            "slotSetting": false,
+            "description": "Enable build during deployment"
+        },
+        {
+            "name": "CORS_ALLOWED_ORIGINS",
+            "value": "",
+            "slotSetting": false,
+            "description": "Comma-separated list of allowed CORS origins (e.g., https://yourdomain.com,https://anotherdomain.com)"
+        },
+        {
+            "name": "LOG_LEVEL",
+            "value": "INFO",
+            "slotSetting": false,
+            "description": "Application log level (DEBUG, INFO, WARNING, ERROR, CRITICAL)"
+        },
+        {
+            "name": "DJANGO_LOG_LEVEL",
+            "value": "INFO",
+            "slotSetting": false,
+            "description": "Django framework log level"
+        },
+        {
+            "name": "SECURE_SSL_REDIRECT",
+            "value": "True",
+            "slotSetting": false,
+            "description": "Force HTTPS redirects"
+        },
+        {
+            "name": "SECURE_HSTS_SECONDS",
+            "value": "31536000",
+            "slotSetting": false,
+            "description": "HTTP Strict Transport Security max age in seconds"
+        },
+        {
+            "name": "ALLOWED_HOSTS",
+            "value": "mydjangotest-exgge0dmfddwbnga.eastus-01.azurewebsites.net",
+            "slotSetting": false,
+            "description": "Comma-separated list of allowed hosts"
+        }
+    ],
+    "connectionStrings": [],
+    "startupCommand": "cd vidly_app && python manage.py migrate --settings=vidly.production_settings && python manage.py collectstatic --noinput --settings=vidly.production_settings && gunicorn --bind 0.0.0.0:8000 --chdir /home/site/wwwroot/vidly_app vidly.wsgi:application",
+    "pythonVersion": "3.11",
+    "notes": [
+        "Replace 'your-app-name' with your actual Azure App Service name",
+        "Generate a secure SECRET_KEY for production use",
+        "Configure DATABASE_URL if using external database (PostgreSQL/MySQL)",
+        "Set CORS_ALLOWED_ORIGINS if you have frontend applications",
+        "Configure REDIS_URL if using Azure Cache for Redis",
+        "All boolean values should be strings ('True'/'False') in Azure App Service",
+        "Use Azure Key Vault references for sensitive values in production: @Microsoft.KeyVault(SecretUri=https://your-vault.vault.azure.net/secrets/secret-name/)"
+    ]
+}

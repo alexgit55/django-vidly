@@ -1,0 +1,80 @@
+name: Build and deploy Python app to Azure Web App
+
+# Trigger the workflow on push to main branch
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+# Environment variables
+env:
+  AZURE_WEBAPP_NAME: 'your-app-name'    # Replace with your Azure Web App name
+  PYTHON_VERSION: '3.11'                # Python version to use
+  AZURE_WEBAPP_PACKAGE_PATH: '.'        # Path to your web app project
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Set up Python version
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          
+      - name: Create and start virtual environment
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+          
+      - name: Install dependencies
+        run: |
+          source venv/bin/activate
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          
+      - name: Collect static files
+        run: |
+          source venv/bin/activate
+          cd vidly_app
+          python manage.py collectstatic --noinput --settings=vidly.production_settings
+          
+      - name: Run tests (optional)
+        run: |
+          source venv/bin/activate
+          cd vidly_app
+          python manage.py test --settings=vidly.production_settings
+          
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v3
+        with:
+          name: python-app
+          path: |
+            .
+            !venv/
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: 'Production'
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+      
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v3
+        with:
+          name: python-app
+          
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v2
+        id: deploy-to-webapp
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          slot-name: 'Production'
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
+          package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}

@@ -1,0 +1,1 @@
+cd vidly_app && python manage.py migrate --settings=vidly.production_settings --noinput && python manage.py collectstatic --noinput --settings=vidly.production_settings && gunicorn --bind 0.0.0.0:8000 vidly.wsgi:application

@@ -1,0 +1,20 @@
+# Deployment configuration for Azure App Service
+# This file tells Azure how to deploy your Django application
+
+# Python version
+PYTHON_VERSION=3.11
+
+# Build commands
+PRE_BUILD_COMMAND="pip install -r requirements.txt"
+BUILD_COMMAND="cd vidly_app && python manage.py collectstatic --noinput --settings=vidly.production_settings"
+
+# Post deployment commands
+POST_BUILD_COMMAND="cd vidly_app && python manage.py migrate --settings=vidly.production_settings"
+
+# Startup command
+STARTUP_COMMAND="cd vidly_app && gunicorn --bind 0.0.0.0:8000 vidly.wsgi:application"
+
+# Environment variables for deployment
+DJANGO_SETTINGS_MODULE=vidly.production_settings
+SCM_DO_BUILD_DURING_DEPLOYMENT=true
+ENABLE_ORYX_BUILD=true
